@@ -10,7 +10,14 @@
 {
     // Initialize SDK with licence key
     NSString *licenceKey = [[NSBundle mainBundle] infoDictionary][@"GSSDK_LICENCE_KEY"];
-    [GSK initWithLicenseKey:licenceKey];
+    BOOL validLicence = [GSK initWithLicenseKey:licenceKey];
+
+    if (!validLicence) {
+        CDVPluginResult *result = [CDVPluginResult resultWithStatus:CDVCommandStatus_ERROR messageAsString:@"License key is not valid or has expired."];
+
+        [self.commandDelegate sendPluginResult:result callbackId:command.callbackId];
+        return;
+    }
 
     // Parameters
     NSString *originalImageUri = [command.arguments objectAtIndex:0];

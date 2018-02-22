@@ -34,12 +34,20 @@ public class GeniusScan extends CordovaPlugin {
     private final int REQUEST_CODE = 42;
     private CallbackContext callback = null;
     private Page scanContainer = null;
+    private String initializeError = null;
+
 
     public static int getResourceIdentifier(String name, String type) {
-      Application app = cordovaInstance.getActivity().getApplication();
-      String package_name = app.getPackageName();
-      Resources resources = app.getResources();
-      return resources.getIdentifier(name, type, package_name);
+        Application app = cordovaInstance.getActivity().getApplication();
+        String package_name = app.getPackageName();
+        Resources resources = app.getResources();
+        return resources.getIdentifier(name, type, package_name);
+    }
+
+    public static String getResourceString (String name, String type) {
+        Application app = cordovaInstance.getActivity().getApplication();
+        Resources resources = app.getResources();
+        return resources.getString(GeniusScan.getResourceIdentifier(name, type));
     }
 
     @Override
@@ -49,19 +57,33 @@ public class GeniusScan extends CordovaPlugin {
 
         Context context = cordova.getActivity().getApplicationContext();
         ApplicationInfo ai = null;
+        String value = null;
         try {
             ai = context.getPackageManager().getApplicationInfo(context.getPackageName(), PackageManager.GET_META_DATA);
+            value = ai.metaData.getString("GSSDK_LICENCE_KEY");
         } catch (PackageManager.NameNotFoundException e) {
             e.printStackTrace();
+            initializeError = GeniusScan.getResourceString("internal_error", "string");
+            return;
         }
-        String value = ai.metaData.getString("GSSDK_LICENCE_KEY");
-        GeniusScanLibrary.init(cordova.getActivity().getApplicationContext(), value);
+
+        try {
+            GeniusScanLibrary.init(cordova.getActivity().getApplicationContext(), value);
+        } catch (RuntimeException e) {
+            initializeError = e.getMessage();
+        }
     }
 
     @Override
     public boolean execute(String action, JSONArray args, CallbackContext callbackContext) throws JSONException {
         if (action.equals("scan")) {
             callback = callbackContext;
+
+            if (initializeError != null) {
+                PluginResult result = new PluginResult(PluginResult.Status.ERROR, initializeError);
+                callback.sendPluginResult(result);
+                return true;
+            }
 
             Uri imageFileUri = Uri.parse(args.getString(0));
             String originalImageFilePath = imageFileUri.getPath();
@@ -88,13 +110,11 @@ public class GeniusScan extends CordovaPlugin {
                 String enhancedImageFilePath = scanContainer.getEnhancedImage().getAbsolutePath(null);
                 Uri enhancedImageFileUri = Uri.fromFile(new File(enhancedImageFilePath));
                 PluginResult result = new PluginResult(PluginResult.Status.OK, enhancedImageFileUri.toString());
-                result.setKeepCallback(true);
                 callback.sendPluginResult(result);
             }
             else
             {
                 PluginResult result = new PluginResult(PluginResult.Status.ERROR, "error" );
-                result.setKeepCallback(true);
                 callback.sendPluginResult(result);
             }
         }

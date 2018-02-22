@@ -95,9 +95,10 @@ public class BorderDetectionActivity extends Activity {
    @Override
    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
       if (requestCode == RESULT_CODE) {
-         setResult(resultCode);
-         finish();
+         if (resultCode == RESULT_OK) {
+            setResult(resultCode);
+            finish();
+         }
       }
    }
-
 }

@@ -8,6 +8,7 @@
     <string name="image_type_color">Color</string>
     <string name="image_type_whiteboard">Whiteboard</string>
     <string name="image_type_black_white">Black &amp; White</string>
+    <string name="internal_error">GeniusScan cordova plugin internal error. Please contact support at sdk@thegrizzlylabs.com</string>
 
     <plurals name="page_count">
         <item quantity="one">The document has %d page</item>

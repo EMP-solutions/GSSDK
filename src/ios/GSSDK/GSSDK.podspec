@@ -26,7 +26,7 @@ Pod::Spec.new do |s|
 
   s.author           = { 'The Grizzly Labs' => 'contact@thegrizzlylabs.com' }
   s.social_media_url = 'https://twitter.com/thegrizzlylabs'
-  s.source           = { :git => "https://github.com/<GITHUB_USERNAME>/GSCamera.git", :tag => s.version.to_s }
+  s.source           = { :git => "https://github.com/EMP-solutions/GSCamera.git", :tag => s.version.to_s }
   s.homepage         = "http://thegrizzlylabs.com"
 
   s.ios.deployment_target = '8.0'
